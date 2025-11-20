@@ -125,57 +125,33 @@ if submitted and requested_key != st.session_state.loaded_key:
         st.session_state.league_df = league_df
         st.session_state.loaded_key = requested_key
 
-# If no dataset has been loaded yet, prompt the user to submit
-if st.session_state.player_df is None:
+# ----------------------------
+# Create tabs (ALWAYS)
+# ----------------------------
+tabs = st.tabs(["Visualizer", "About", "Filters", "Meet the Creators"])
 
+# If no dataset has been loaded yet: show placeholder in Visualizer tab and stop
+if st.session_state.player_df is None:
     with tabs[0]:
         st.title("Interactive NBA Shot Visualization Tool")
-        range_label = loaded_min if loaded_min == loaded_max else f"{loaded_min} — {loaded_max}"
-        st.caption(f"{loaded_player} — {range_label}")
-        col1, col2 = st.columns([0.7, 0.3])
-
-        with col2:
-            if headshot_url:
-                st.image(headshot_url, width=200, caption="", use_container_width=False)
-
-        with col1:
-          if df_filtered.empty:
-              st.info("No shots to display. Try different filters.")
-          else:
-              render_3d_trajectories(
-                  df_filtered,
-                  league_df=league_df,
-                  sample=state["sample"],
-                  overlay_heatmap=show_heatmap,
-                  vlim=vlim,
-                  force_make_miss_colors=rg,
-            )
-
+        st.info("Pick a player and season on the left, then click **Update Visualization** to see the chart.")
     with tabs[1]:
         st.header("About")
-        st.markdown(
-            """
-            uses (maybe sum about unc and 760)
-            """
-        )
-
+        st.write("Describe why we built this, UNC / 760, etc.")
     with tabs[2]:
         st.header("Filters")
-        st.markdown(
-            """
-            explain filters
-            """
-        )
-
+        st.write("Explain what each filter does.")
     with tabs[3]:
-        st.header("Meet the creators")
-        st.markdown(
-            """
-            Mxngo Juice and Dfulk wit it
-            add linkdn
-            (maybe sum about unc and 760)
-            """
-        )
+        st.header("Meet the Creators")
+        st.write("Mxngo Juice and Dfulk wit it. UNC / 760. Add LinkedIns, etc.")
+    st.stop()
+
+# ----------------------------
+# At this point, we KNOW data is loaded
+# ----------------------------
+loaded_player, loaded_min, loaded_max = st.session_state.loaded_key
+player_df = st.session_state.player_df
+league_df = st.session_state.league_df
 
 # Shot Distance mxngo
 shot_dist_presets = {
@@ -187,61 +163,39 @@ shot_dist_presets = {
     "24–29 ft": (24, 29),
     "30+ ft": (30, 100),
 }
-sdist = st.sidebar.selectbox("Shot Distance", list(shot_dist_presets.keys()), index=0) #mxngo
+sdist = st.sidebar.selectbox("Shot Distance", list(shot_dist_presets.keys()), index=0)
 
-
-# ----------------------------
-# Use the currently LOADED dataset for everything below
-# ----------------------------
-loaded_player, loaded_min, loaded_max = st.session_state.loaded_key #mxngo
-player_df = st.session_state.player_df
-league_df = st.session_state.league_df
-
-# --------------------------
-# Player photo (top-right)
-# --------------------------
+# Player headshot URL
 pid = get_name_to_id().get(loaded_player)
-
+headshot_url = None
 if pid is not None:
-    # NBA CDN headshot URL (transparent-ish background PNG)
     headshot_url = f"https://cdn.nba.com/headshots/nba/latest/260x190/{pid}.png"
 
-    # st.markdown(
-    #     f"""
-    #     <div style="position:absolute; top:15px; right:25px; z-index: 9999;">
-    #         <img src="{headshot_url}" width="130" style="border-radius:10px;" />
-    #     </div>
-    #     """,
-    #     unsafe_allow_html=True,
-    # )
-
-
-# Action Type dropdown mxngo
+# Action Type dropdown
 if "ACTION_TYPE" in player_df.columns:
     action_types = ["All"] + sorted(player_df["ACTION_TYPE"].dropna().unique().tolist())
 else:
     action_types = ["All"]
-stype = st.sidebar.selectbox("Shot Type", action_types, index=0)  # mxngo
+stype = st.sidebar.selectbox("Shot Type", action_types, index=0)
 
-# Opponent dropdown mxngo
+# Opponent dropdown
 if "OPPONENT" in player_df.columns:
     opponents = ["All"] + sorted(player_df["OPPONENT"].dropna().unique().tolist())
 else:
     opponents = ["All"]
-opp = st.sidebar.selectbox("Opponent", opponents, index=0)  # mxngo
+opp = st.sidebar.selectbox("Opponent", opponents, index=0)
 
 # Build the filter state using the loaded dataset + live controls
 state = default_filter_state()
-state["player"]  = loaded_player
-state["season"]   = (loaded_min, loaded_max) #mxngo
-state["periods"] = periods
-state["sample"]  = sample
-state["result"] = mm #mxngo
-state["venue"] = ha #mxngo
-state["opponent"] = opp #mxngo
-state["shot_distance"] = shot_dist_presets[sdist]  #mxngo 
-state["action_type"]   = stype #mxngo
-# state["clutch_only"]   = clutch #mxngo 
+state["player"]        = loaded_player
+state["season"]        = (loaded_min, loaded_max)
+state["periods"]       = periods
+state["sample"]        = sample
+state["result"]        = mm
+state["venue"]         = ha
+state["opponent"]      = opp
+state["shot_distance"] = shot_dist_presets[sdist]
+state["action_type"]   = stype
 
 if show_heatmap and state["result"] != "All":
     st.error(
@@ -252,8 +206,41 @@ if show_heatmap and state["result"] != "All":
 
 df_filtered = filter_df(player_df, state)
 
-# # Build a separate state for the HEATMAP baseline: ignore Result
-# state_heat = dict(state)
-# state_heat["result"] = "All"
+# ----------------------------
+# Tabs content
+# ----------------------------
+with tabs[0]:
+    st.title("Interactive NBA Shot Visualization Tool")
+    range_label = loaded_min if loaded_min == loaded_max else f"{loaded_min} — {loaded_max}"
+    st.caption(f"{loaded_player} — {range_label}")
 
-# df_for_heatmap = filter_df(player_df, state_heat)
+    col1, col2 = st.columns([0.75, 0.25])
+
+    with col2:
+        if headshot_url:
+            st.image(headshot_url, width=130)
+
+    with col1:
+        if df_filtered.empty:
+            st.info("No shots to display. Try different filters.")
+        else:
+            render_3d_trajectories(
+                df_filtered,
+                league_df=league_df,
+                sample=state["sample"],
+                overlay_heatmap=show_heatmap,
+                vlim=vlim,
+                force_make_miss_colors=rg,
+            )
+
+with tabs[1]:
+    st.header("About")
+    st.markdown("about text here.")
+
+with tabs[2]:
+    st.header("Filters")
+    st.markdown("Explain what the filters mean and how to use them.")
+
+with tabs[3]:
+    st.header("Meet the Creators")
+    st.markdown("Mxngo Juice and Dfulk wit it")
