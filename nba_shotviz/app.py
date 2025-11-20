@@ -128,7 +128,7 @@ if submitted and requested_key != st.session_state.loaded_key:
 # ----------------------------
 # Create tabs (ALWAYS)
 # ----------------------------
-tabs = st.tabs(["Visualizer", "About", "Filters", "Meet the Creators"])
+tabs = st.tabs(["Visualizer", "About", "Filters"])
 
 # If no dataset has been loaded yet: show placeholder in Visualizer tab and stop
 if st.session_state.player_df is None:
@@ -140,10 +140,59 @@ if st.session_state.player_df is None:
         st.write("Describe why we built this, UNC / 760, etc.")
     with tabs[2]:
         st.header("Filters")
-        st.write("Explain what each filter does.")
-    with tabs[3]:
-        st.header("Meet the Creators")
-        st.write("Mxngo Juice and Dfulk wit it. UNC / 760. Add LinkedIns, etc.")
+        st.markdown(
+            """
+            Use the filters in the left sidebar to customize the visualization:
+    
+            **Max shots to display**  
+            - Limits how many shots are drawn as 3D arcs.  
+            - Helpful for speeding up rendering or focusing on a smaller sample.
+    
+            **Result (All / Makes / Misses)**  
+            - **All**: shows every shot in the dataset.  
+            - **Makes**: only made shots are included.  
+            - **Misses**: only missed shots are included.
+    
+            **Venue (All / Home / Away)**  
+            - Filter shots by where the game was played.  
+            - *Home*: games where the selected player's team is listed as the home team.  
+            - *Away*: games where they are listed as the road team.
+    
+            **Quarters (Q1, Q2, Q3, Q4, OT)**  
+            - Toggle which periods to include.  
+            - For example, turning on only **Q4** lets you focus on late-game shooting.
+    
+            **Shot Distance**  
+            - Bucketed ranges in feet from the basket (e.g., 0–4 ft, 24–29 ft).  
+            - Use this to isolate rim attacks, mid-range, or three-point shots.
+    
+            **Shot Type**  
+            - Based on the `ACTION_TYPE` from the NBA play data  
+              (e.g., *Jump Shot*, *Layup*, *Driving Dunk*).  
+            - Choose **All** to combine every shot type.
+    
+            **Opponent**  
+            - Filter shots by the opposing team.  
+            - Use this to see how a player performs against a specific matchup.
+    
+            **Show Hot/Cold Zones (vs league)**  
+            - When enabled, overlays a floor heatmap comparing the player's FG% to
+              league-average FG% by zone.  
+            - **Blue areas**: player is colder than league average.  
+            - **Red areas**: player is hotter than league average.  
+    
+            **Heatmap scale (±FG% points)**  
+            - Controls how “sensitive” the color scale is.  
+            - Smaller values highlight subtle differences; larger values emphasize only
+              big gaps from league average.
+    
+            **Color arcs red/green**  
+            - When on, made shots are shown in green and misses in red.  
+            - When off, all arcs are rendered in a neutral color (especially useful
+              when a heatmap is displayed underneath).
+            """
+        )
+
     st.stop()
 
 # ----------------------------
