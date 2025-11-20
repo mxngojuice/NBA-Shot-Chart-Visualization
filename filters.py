@@ -15,7 +15,7 @@ def default_filter_state() -> dict:
         "player": None,
         "season": None,
         "opponent": None,
-        "periods": [1, 2, 3, 4],
+        "periods": [1, 2, 3, 4, 5],
         "context": [],   # unused for now
         "sample": 1000,
         "result": "All", #mxngo
