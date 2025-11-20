@@ -105,13 +105,12 @@ def add_shots_from_df(
         # Safe extraction
         action = row.get("ACTION_TYPE", "Unknown")
         dist   = row.get("SHOT_DISTANCE", None)
-        dist_s = f"{dist:.1f} ft" if dist is not None else "—"
 
         made = bool(row.get("SHOT_MADE_FLAG", 0))
         result = "MAKE" if made else "MISS"
 
         # New hover text
-        hover = f"{action} · {dist_s} · {result}"
+        hover = f"{action} · {dist} · {result}"
 
 
         add_shot_arc(
