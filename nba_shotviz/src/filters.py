@@ -24,12 +24,6 @@ def default_filter_state() -> dict:
         # "clutch_only": False, 
     }
     
-if show_heatmap and state["result"] != "All":
-    st.error(
-        "Hot/Cold Zones can only be computed when **Result = 'All'**.\n\n"
-        "Either switch Result back to **All** or turn off **Show Hot/Cold Zones**."
-    )
-    st.stop()
 
 
 def filter_df(df: pd.DataFrame, state: dict) -> pd.DataFrame:
