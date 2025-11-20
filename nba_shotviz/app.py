@@ -99,7 +99,7 @@ q1 = st.sidebar.checkbox("Q1", value=True)
 q2 = st.sidebar.checkbox("Q2", value=True)
 q3 = st.sidebar.checkbox("Q3", value=True)
 q4 = st.sidebar.checkbox("Q4", value=True)
-ot = st.sidebar.checkbox("OT", value=False)
+ot = st.sidebar.checkbox("OT", value=True)
 periods = []
 if q1: periods.append(1)
 if q2: periods.append(2)
