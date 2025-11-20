@@ -14,20 +14,18 @@ st.set_page_config(page_title="Player Development — 3D Shot Viz", layout="wide
 
 # Tab Headers
 
-st.markdown("""
+st.markdown(
+    """
     <style>
-        /* Increase tab header font size */
-        .stTabs [data-baseweb="tab"] {
-            font-size: 1.1rem !important;
-            padding: 10px 16px !important;
-        }
-
-        /* Make selected tab text bold */
-        .stTabs [aria-selected="true"] {
-            font-weight: 700 !important;
-        }
+    /* Make tab label text bigger and bolder */
+    button[data-baseweb="tab"] div[data-testid="stMarkdownContainer"] p {
+        font-size: 1.2rem;
+        font-weight: 600;
+    }
     </style>
-""", unsafe_allow_html=True)
+    """,
+    unsafe_allow_html=True,
+)
 
 # ----------------------------
 # Sidebar
@@ -129,9 +127,55 @@ if submitted and requested_key != st.session_state.loaded_key:
 
 # If no dataset has been loaded yet, prompt the user to submit
 if st.session_state.player_df is None:
-    st.title("Interactive NBA Shot Visualization Tool")
-    st.info("Pick a player and season, then click **Update Visualization**.")
-    st.stop()
+
+    with tabs[0]:
+        st.title("Interactive NBA Shot Visualization Tool")
+        range_label = loaded_min if loaded_min == loaded_max else f"{loaded_min} — {loaded_max}"
+        st.caption(f"{loaded_player} — {range_label}")
+        col1, col2 = st.columns([0.7, 0.3])
+
+        with col2:
+            if headshot_url:
+                st.image(headshot_url, width=200, caption="", use_container_width=False)
+
+        with col1:
+          if df_filtered.empty:
+              st.info("No shots to display. Try different filters.")
+          else:
+              render_3d_trajectories(
+                  df_filtered,
+                  league_df=league_df,
+                  sample=state["sample"],
+                  overlay_heatmap=show_heatmap,
+                  vlim=vlim,
+                  force_make_miss_colors=rg,
+            )
+
+    with tabs[1]:
+        st.header("About")
+        st.markdown(
+            """
+            uses (maybe sum about unc and 760)
+            """
+        )
+
+    with tabs[2]:
+        st.header("Filters")
+        st.markdown(
+            """
+            explain filters
+            """
+        )
+
+    with tabs[3]:
+        st.header("Meet the creators")
+        st.markdown(
+            """
+            Mxngo Juice and Dfulk wit it
+            add linkdn
+            (maybe sum about unc and 760)
+            """
+        )
 
 # Shot Distance mxngo
 shot_dist_presets = {
@@ -213,57 +257,3 @@ df_filtered = filter_df(player_df, state)
 # state_heat["result"] = "All"
 
 # df_for_heatmap = filter_df(player_df, state_heat)
-
-# ----------------------------
-# Main content with tabs
-# ----------------------------
-tabs = st.tabs(["Visualizer", "About", "Filters", "Meet the Creators"])
-
-with tabs[0]:
-    st.title("Interactive NBA Shot Visualization Tool")
-    range_label = loaded_min if loaded_min == loaded_max else f"{loaded_min} — {loaded_max}"
-    st.caption(f"{loaded_player} — {range_label}")
-    col1, col2 = st.columns([0.7, 0.3])
-
-    with col2:
-        if headshot_url:
-            st.image(headshot_url, width=120, caption="", use_container_width=False)
-
-    with col1:
-      if df_filtered.empty:
-          st.info("No shots to display. Try different filters.")
-      else:
-          render_3d_trajectories(
-              df_filtered,
-              league_df=league_df,
-              sample=state["sample"],
-              overlay_heatmap=show_heatmap,
-              vlim=vlim,
-              force_make_miss_colors=rg,
-        )
-
-with tabs[1]:
-    st.header("About")
-    st.markdown(
-        """
-        uses (maybe sum about unc and 760)
-        """
-    )
-
-with tabs[2]:
-    st.header("Filters")
-    st.markdown(
-        """
-        explain filters
-        """
-    )
-
-with tabs[3]:
-    st.header("Meet the creators")
-    st.markdown(
-        """
-        Mxngo Juice and Dfulk wit it
-        add linkdn
-        (maybe sum about unc and 760)
-        """
-    )
