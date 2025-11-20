@@ -30,7 +30,7 @@ def render_3d_trajectories(
             st.warning("League averages missing; cannot render hot/cold zones.")
         else:
             # 1) Build the heatmap grid + labels + hover text
-            X, Y, Zdiff, labels, htext = zone_diff_grid(
+            X, Y, Zdiff, labels, hover = zone_diff_grid(
                 df, league_df, bin_ft=2.0, return_labels=True, return_text=True
             )
 
@@ -40,7 +40,7 @@ def render_3d_trajectories(
             )
 
             # 3) Add invisible hover markers at cell centers
-            add_zone_hover_markers(fig, X, Y, htext, z_up=0.011)
+            add_zone_hover_markers(fig, X, Y, hover, z_up=0.011)
 
             # 4) Draw crisp zone boundaries on top
             add_zone_boundaries_from_labels(fig, X, Y, labels, z_up=0.09, width=3, halo=True)

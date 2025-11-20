@@ -101,8 +101,18 @@ def add_shots_from_df(
             color = uniform_color
         else:
             color = "#2ca02c" if made else "#d62728"
+            
+        # Safe extraction
+        action = row.get("ACTION_TYPE", "Unknown")
+        dist   = row.get("SHOT_DISTANCE", None)
+        dist_s = f"{dist:.1f} ft" if dist is not None else "—"
 
-        hover = f"({row['LOC_X']:.0f},{row['LOC_Y']:.0f}) in → ({x0:.1f},{y0:.1f}) ft · {'MAKE' if made else 'MISS'}"
+        made = bool(row.get("SHOT_MADE_FLAG", 0))
+        result = "MAKE" if made else "MISS"
+
+        # New hover text
+        hover = f"{action} · {dist_s} · {result}"
+
 
         add_shot_arc(
             fig, x0, y0,

@@ -12,6 +12,23 @@ from src.data_io import get_available_players, get_available_seasons, load_shotl
 
 st.set_page_config(page_title="Player Development — 3D Shot Viz", layout="wide")
 
+# Tab Headers
+
+st.markdown("""
+    <style>
+        /* Increase tab header font size */
+        .stTabs [data-baseweb="tab"] {
+            font-size: 1.1rem !important;
+            padding: 10px 16px !important;
+        }
+
+        /* Make selected tab text bold */
+        .stTabs [aria-selected="true"] {
+            font-weight: 700 !important;
+        }
+    </style>
+""", unsafe_allow_html=True)
+
 # ----------------------------
 # Sidebar
 # ----------------------------
@@ -145,14 +162,14 @@ if pid is not None:
     # NBA CDN headshot URL (transparent-ish background PNG)
     headshot_url = f"https://cdn.nba.com/headshots/nba/latest/260x190/{pid}.png"
 
-    st.markdown(
-        f"""
-        <div style="position:absolute; top:15px; right:25px; z-index: 9999;">
-            <img src="{headshot_url}" width="130" style="border-radius:10px;" />
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
+    # st.markdown(
+    #     f"""
+    #     <div style="position:absolute; top:15px; right:25px; z-index: 9999;">
+    #         <img src="{headshot_url}" width="130" style="border-radius:10px;" />
+    #     </div>
+    #     """,
+    #     unsafe_allow_html=True,
+    # )
 
 
 # Action Type dropdown mxngo
@@ -198,20 +215,55 @@ df_filtered = filter_df(player_df, state)
 # df_for_heatmap = filter_df(player_df, state_heat)
 
 # ----------------------------
-# Main content
+# Main content with tabs
 # ----------------------------
-st.title("Interactive NBA Shot Visualization Tool")
-range_label = loaded_min if loaded_min == loaded_max else f"{loaded_min} — {loaded_max}"
-st.caption(f"{loaded_player} — {range_label}")
+tabs = st.tabs(["Visualizer", "About", "Filters", "Meet the Creators"])
 
-if df_filtered.empty:
-    st.info("No shots to display. Try different filters.")
-else:
-    render_3d_trajectories(
-        df_filtered,
-        league_df=league_df,
-        sample=state["sample"],
-        overlay_heatmap=show_heatmap,
-        vlim=vlim,
-        force_make_miss_colors=rg, #mxngo
+with tabs[0]:
+    st.title("Interactive NBA Shot Visualization Tool")
+    range_label = loaded_min if loaded_min == loaded_max else f"{loaded_min} — {loaded_max}"
+    st.caption(f"{loaded_player} — {range_label}")
+    col1, col2 = st.columns([0.7, 0.3])
+
+    with col2:
+        if headshot_url:
+            st.image(headshot_url, width=120, caption="", use_container_width=False)
+
+    with col1:
+      if df_filtered.empty:
+          st.info("No shots to display. Try different filters.")
+      else:
+          render_3d_trajectories(
+              df_filtered,
+              league_df=league_df,
+              sample=state["sample"],
+              overlay_heatmap=show_heatmap,
+              vlim=vlim,
+              force_make_miss_colors=rg,
+        )
+
+with tabs[1]:
+    st.header("About")
+    st.markdown(
+        """
+        uses (maybe sum about unc and 760)
+        """
+    )
+
+with tabs[2]:
+    st.header("Filters")
+    st.markdown(
+        """
+        explain filters
+        """
+    )
+
+with tabs[3]:
+    st.header("Meet the creators")
+    st.markdown(
+        """
+        Mxngo Juice and Dfulk wit it
+        add linkdn
+        (maybe sum about unc and 760)
+        """
     )

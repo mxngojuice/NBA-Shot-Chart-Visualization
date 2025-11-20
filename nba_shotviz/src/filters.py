@@ -23,7 +23,6 @@ def default_filter_state() -> dict:
         "action_type": "All",  #mxngo
         # "clutch_only": False, 
     }
-    
 
 
 def filter_df(df: pd.DataFrame, state: dict) -> pd.DataFrame:
